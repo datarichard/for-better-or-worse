@@ -27,8 +27,9 @@ Using `ghmh` scores from each person in HILDA (`xwaveid`) who experienced bankru
 6  100003  3.0000000   80 Male
 ```
 
-\  
-
+    
+  
+  
 #### Fit a model for 3 classes  
 
 `hlme` allows non-linear growth using quadratic and 
@@ -45,8 +46,9 @@ hlme(ghmh ~ time + I(time^2) + I(time^3) + sex,
 ```
 
 NB. No starting values were provided and `gridsearch()` is usually recommended.  
-\  
-
+  
+  
+  
 #### Evaluate the quality of classification  
 
 Check the size and distinctiveness of each class. _Mean posterior probabilities_ greater than 70% are acceptable (*mpp* > 80% are good).  
@@ -75,8 +77,9 @@ prob>0.9  35.49  67.22  24.69
 
 The three classes distinguished by this model are dominated by a single class (`class2` is 83.96% of cases). The _mean posterior probablities_ of each class are acceptable (lowest _mpp_ is `0.7331`), however the _individual posterior probabilities_ are below an acceptable threshold (`prob>0.7`) for `class1` (66.76%) and `class3` (53.09%).  
 
-\  
-
+  
+  
+  
 #### Examine the predicted trajectory versus mean (95%CI) observed trajectory  
 
 ```
@@ -85,9 +88,9 @@ plot(m3)
 
 ![](results/figures/plot_ghmh_lefnw_3groups.png)<!-- -->  
 
-Three classes were identified for which some predicted values fall outside the 95%CI range of observed values. Overall the model predictions do not capture the observed trajectories with sufficient precision.  
+Three classes were identified for which some predicted values fall outside the 95%CI expected range of the observed mean values. Overall the model predictions do not capture the observed trajectories with sufficient precision.  
 
-Given the domination by a single class (`class2`), indistinct classification of individuals (prob<0.7), and imprecise trajectory fit, the results do not support clear heterogeneity in response to bankruptcy. 
+Given the domination by a single class (`class2`), indistinct classification of individuals (probs. < 0.7), and imprecise trajectory fit, the results do not support clear heterogeneity in response to bankruptcy. 
 
 
 
