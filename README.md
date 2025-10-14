@@ -5,10 +5,8 @@ This project describes the heterogeneity of happiness trajectories around life e
 
 It uses the [lcmm](https://cecileproust-lima.github.io/lcmm/index.html) package to estimate a **latent class linear mixed model** with `hlme()` on happiness scores around distinct life events (e..g, `lefnw`) from the HILDA survey.  
 
-
-\ 
-
-\  
+  
+<br>
 
 ***  
 
@@ -28,7 +26,7 @@ Using `ghmh` scores from each person in HILDA (`xwaveid`) who experienced bankru
 ```
 
     
-  
+<br>
   
 #### Fit a model for 3 classes  
 
@@ -47,7 +45,7 @@ hlme(ghmh ~ time + I(time^2) + I(time^3) + sex,
 
 NB. No starting values were provided and `gridsearch()` is usually recommended.  
   
-  
+<br>
   
 #### Evaluate the quality of classification  
 
@@ -78,7 +76,7 @@ prob>0.9  35.49  67.22  24.69
 The three classes distinguished by this model are dominated by a single class (`class2` is 83.96% of cases). The _mean posterior probablities_ of each class are acceptable (lowest _mpp_ is `0.7331`), however the _individual posterior probabilities_ are below an acceptable threshold (`prob>0.7`) for `class1` (66.76%) and `class3` (53.09%).  
 
   
-  
+<br>
   
 #### Examine the predicted trajectory versus mean (95%CI) observed trajectory  
 
