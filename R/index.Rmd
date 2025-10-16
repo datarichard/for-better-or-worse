@@ -1,0 +1,107 @@
+---
+title: "For better or worse"
+output: html_document
+date: "`r Sys.Date()`"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+# Follow-up to shit-happens  
+
+
+This project describes the heterogeneity of mental health (MHi-5) trajectories around life events.  
+
+The objective is to identify distinctive trajectories or _response-types_ in the average response to life-events, and challenge assumptions that an "average" trajectory exists. The aim does not include identifying the predictors of those trajectories/*response-types*, since identifying the predictors is an extensive goal in its own right and would need to be done in a separate project and only after identifying the presence of distinct *response-types*. Nevertheless the distinguishing characteristics of each *response-type* are explored and described in subsequent sections.  
+
+<br>
+
+## Problem statement  
+
+Predicting mental health outcomes around life-events is irreproducible because of time-varying exposures:  
+
+- if you try to predict mental health around a life-event, then the timing of measurement is very important. Single timing approach is flawed
+- eg compare predictions of mental health at post12 vs post48 and they will look very different depending on the timing of the observation
+- so if you are going to ask what predicts a good outcome/bad outcome the answer will be entirely different depending on the timepoint chosen after the event
+- So need to make outcome a dynamic trajectory
+- Using a single timepoint of exposure is also flawed because the "static" measurements are also changing in their own trajectory.  
+
+
+
+<br>
+
+## Background  
+
+Quantile regression of life satisfaction trajectories shows real differences between responses at different levels of happiness ([O'Leary et al 2020](https://www.sciencedirect.com/science/article/pii/S0264999320311846)).  
+
+
+Finite mixture modelling of psychological health (MHI-5) trajectories shows a heterogenious response to major life events, which identifies three latent trajectories - no response, moderate response and recovery, rapid/steep response and recovery ([Etile et al 2020](https://www.sciencedirect.com/science/article/abs/pii/S0167268121003838)).  
+
+
+
+
+<br>
+
+## Methods  
+
+<br>
+
+### Growth Mixture Models (GMM)  
+
+Standard growth models (*Latent Growth Curve Analysis* or LGCA) estimate a single trajectory that averages the individual trajectories of all participants in the sample. Individual differences are captured by estimating a random coefficient representing the variability around the slope and intercept. Categorical or continuous features can be used to predict individual differences in slope or intercept (e.g., risk factors). Only useful when all individuals are expected to change in the same direction over time (degree of change can vary).  
+
+**GMM** extends LGCA by allowing for multiple latent classes, each with its own growth trajectory. It estimates class-specific means and variances for intercepts and slopes. Non-linear slopes can be included using polynomial terms (quadrative and cubic trends), or by relaxing the functional form entirely using splines. Individuals are probabilistically assigned to classes based on their data. GMM captures heterogeneity in the marginal trajectory, and allows for within-class variability so individuals within a class can still differ somewhat.    
+
+
+<br>
+
+### Current study  
+
+Here we used polynomial terms (i.e., linear, quadratic and cubic trends) to distinguish the trajecotry of each latent class. Polynomial terms are a common choice due to their flexibility and ease of implementation, however they impose some restrictions on the functional form (e.g., they do not allow for extrapolation or prediction beyond the observed data range). In our case the restricted functional form is not a disadvantage since our aim is descriptive, and the restriction will facilitate convergence during model estimation. We selected a data range of ±3 years around the event, which was deemed sufficient to capture the variation due to anticipation and reaction to the event. Years beyond this range are likely to reflect other events or factors (rendering any extrapolation unreliable and of little value, see Kettlewell et al 2020 and also Fritjers et al). We also restricted the analysis to 3rd order terms because higher order polynomial terms result in parameters that are difficult to interpret, and are highly contingent on data handling features such as centering choices (Dalal and Zickar (2012).
+
+
+Nested models testing the inclusion of each additional trajectory j can be tested using 2∆BIC (two times the difference in BIC). 2∆BIC < 2 is weak evidence for the more complex model; < 6 moderate evidence; < 10 strong evidence; > 10 very strong. (still need to ensure parsimony by iteratively removing non-significant cubic and quadratic terms).  
+
+
+Group membership probabilities were calculated for each trajectory by the aggregate size of each trajectory (i.e., the number of people in each j).  
+
+
+Posterior probabilities were calculated post hoc by estimating the probability that each person belongs to each trajectory, and a **maximum-probability assignment rule** was used to assign each individual to the trajectory he/she holds the highest posterior membership probability.  
+
+
+The **average posterior probability of group membership** was calculated by averaging the posterior probabilities of individuals having been assigned group membership by the maximum probability assignment rule. APP > .7 or .8 indicated similar patterns of change within trajectories and good discrimination between trajectories (i.e., good internal reliability).  
+
+
+e.g., a bastardized LCGA method. This may be equivalent to heirarchical growth analysis (see Nagin 2010) or more simply a latent growth curve (LGC) analysis  (Stoel et al 2003; Llabre et al 2004).  
+
+<br>
+
+#### Notes of caution:  
+
+- Erosheva, E. A., Matsueda, R. L., & Telesca, D. (2014). Breaking bad: two decades of life- course data analysis in criminology, developmental psychology, and beyond. Annual Review of Statistics and Its Application, 1, 301-332.
+- Bauer DJ. 2007. Observations on the use of growth mixture models in psychological research. Multivar. Behav.Res. 42(4):757–86.
+- Bauer DJ, Curran PJ. 2003a. Distributional assumptions of growth mixture models: Implications for overextraction of latent trajectory classes. Psychol. Methods 8(3):338–63.
+- Bauer DJ, Curran PJ. 2004. The integration of continuous and discrete latent variable models: Fourth level potential problems and promising opportunities. Psychol. Methods 9(1):3–29.
+- Hoeksma, J. B., & Kelderman, H. (2006). On growth curves and mixture models. Infant and Child Development: An International Journal of Research and Practice, 15(6), 627-634.
+- Sonya K. Sterba , Ruth E. Baldasaro & Daniel J. Bauer (2012) Factors affecting the adequacy and preferability of semiparametric groups-based approximations of continuous growth trajectories, Multivariate Behavioral Research, 47:4, 590-634.  
+
+
+<br>
+
+
+# Appendix  
+
+<br>
+
+### Latent Class Growth Analysis (LCGA) (Nagin 1999, 2001)  
+
+https://www.tqmp.org/RegularArticles/vol05-1/p011/p011.pdf  
+
+**LCGA** is a semi-parametric technique used to identify distinct subgroups of individuals following a similar pattern of change over time. Non-linear trajectories can be modelled by including parametric terms (e.g., linear, quadratic, cubic). Heterogeneity is summarised by a finite set of unique polynomial functions each corresponding to a distinct trajectory. Instead of modelling individual differences with random coefficients, LCGA fixes the slope and intercept to equality across individuals ***within a trajectory***. This means the variance in growth parameters are fixed to zero, and there is no additional variation within class - just random error. See Nagin 2005 for details.   
+
+See R package `lcmm` and specify no random effect (i.e., random=~-1 in lcmm or hlme)  
+
+Other forms of growth curve modelling also use fixed functional forms (linear, quadratic and cubic trends) to identify trajectories, including the standard growth curve models or group-based models (Nagin 1999, 2005, 2010).  
+
+

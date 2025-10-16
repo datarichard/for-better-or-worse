@@ -53,3 +53,10 @@ fdf <- read_rds("data/lefnw_mf.rds") |>
 
 plot(m3, which="fit", var.time="time", marg=FALSE, shades = TRUE)  
 
+
+# Publish ####
+rmarkdown::render(
+  input = "R/index.Rmd",
+  output_file = "index.html",
+  output_dir = "docs/"
+)
