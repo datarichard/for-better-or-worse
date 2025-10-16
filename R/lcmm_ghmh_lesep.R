@@ -40,7 +40,7 @@ fdf <- df |>
   
 
 ghmh.m1 <- hlme(ghmh ~ time + I(time^2) + I(time^3) + sex,
-           random =~ time, # + I(time^2) + I(time^3),
+           random =~ time + I(time^2) + I(time^3),
            subject = 'xwaveid', 
            ng = 1,
            data = fdf)
@@ -50,7 +50,7 @@ ghmh.m1 <- hlme(ghmh ~ time + I(time^2) + I(time^3) + sex,
 # Estimation considering 2 classes : 
 ghmh.m2 <- gridsearch(
   hlme(ghmh ~ time + I(time^2) + I(time^3) + sex,
-           random =~ time, # + I(time^2) + I(time^3),
+           random =~ time + I(time^2) + I(time^3),
            subject = 'xwaveid', 
            data = fdf, 
            ng = 2, 
@@ -67,7 +67,7 @@ plot(ghmh.m2, which="fit", var.time="time", marg=FALSE, shades = TRUE)
 # Estimation considering 3 classes : 
 ghmh.m3 <- gridsearch(
   hlme(ghmh ~ time + I(time^2) + I(time^3) + sex,
-           random =~ time, # + I(time^2) + I(time^3),
+           random =~ time + I(time^2) + I(time^3),
            subject = 'xwaveid', 
            data = fdf, 
            ng = 3, 
@@ -84,7 +84,7 @@ plot(ghmh.m3, which="fit", var.time="time", marg=FALSE, shades = TRUE)
 # Estimation considering 4 classes : 
 ghmh.m4 <- gridsearch(
   hlme(ghmh ~ time + I(time^2) + I(time^3) + sex,
-           random =~ time, # + I(time^2) + I(time^3),
+           random =~ time + I(time^2) + I(time^3),
            subject = 'xwaveid', 
            data = fdf, 
            ng = 4, 
@@ -106,5 +106,12 @@ summarytable(ghmh.m1, ghmh.m2, ghmh.m3, ghmh.m4,
 summaryplot(ghmh.m1, ghmh.m2, ghmh.m3, ghmh.m4,
             which = c("BIC", "entropy","ICL"))
              
+# summaryplot(
+#   read_rds("results/ghmh_lesep_1group.rds"),
+#   read_rds("results/ghmh_lesep_2group.rds"),
+#   read_rds("results/ghmh_lesep_3group.rds"),
+#   ghmh.m4,
+#   which = c("BIC", "entropy","ICL")
+# )
 
              
