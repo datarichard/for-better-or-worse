@@ -73,7 +73,7 @@ prob>0.8  54.65  81.81  35.80
 prob>0.9  35.49  67.22  24.69
 ```
 
-The three classes distinguished by this model are dominated by a single class (`class2` is 83.96% of cases). The _mean posterior probablities_ of each class are acceptable (lowest _mpp_ is `0.7331`), however the _individual posterior probabilities_ are below an acceptable threshold (`prob>0.7`) for `class1` (66.76%) and `class3` (53.09%).  
+The three classes distinguished by this model are dominated by a single class (`class2` is 83.96% of cases). The _mean posterior probablities_ of each class are acceptable (lowest _mpp_ is `0.7331`), however the _individual posterior probabilities_ for some classes are poor (e.g., `class3` 53.09%). This indicates a substantial proportion of individuals are not strongly classified into `class1` or `class3`, perhaps due to overlapping trajectories or too many classes in the model. A potential fix would be to add class predictors to the model (via the `classmb` arguement).     
 
   
 <br>
@@ -81,14 +81,14 @@ The three classes distinguished by this model are dominated by a single class (`
 #### Examine the predicted trajectory versus mean (95%CI) observed trajectory  
 
 ```
-plot(m3)
+plot(m3, which="fit", var.time="time", marg=FALSE, shades = TRUE)  
 ```
 
 ![](results/figures/plot_ghmh_lefnw_3groups.png)<!-- -->  
 
-Three classes were identified for which some predicted values fall outside the 95%CI expected range of the observed mean values. Overall the model predictions do not capture the observed trajectories with sufficient precision.  
+Three classes were identified with distinct trajectories, however some predicted values fell outside the 95%CI expected range of the observed mean values. Overall the model predictions did not capture the observed trajectories with sufficient precision.  
 
-Given the domination by a single class (`class2`), indistinct classification of individuals (probs. < 0.7), and imprecise trajectory fit, the results do not support clear heterogeneity in response to bankruptcy. 
+Given the domination by a single class (`class2`), ambiguous classification of individuals between the other two smallest classes, and imprecise trajectory fit, the results do not support clear heterogeneity in response to bankruptcy.  
 
 
 
