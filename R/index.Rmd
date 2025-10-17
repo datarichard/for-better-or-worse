@@ -1,21 +1,43 @@
 ---
 title: "For better or worse"
-output: html_document
-date: "`r Sys.Date()`"
+subtitle: "The heterogeneous impact of major life events on mental health"
+author: "Richard W Morris"
+date: "`r format(Sys.Date(), '%b %d %Y')`"
+bibliography: references.bib
+csl: apa-6th-edition.csl
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+    collapsed: false
+    number_sections: true
+    theme: cerulean
+editor_options: 
+  chunk_output_type: console
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE)
+library(tidyverse)
+library(lcmm)
+library(patchwork)
 ```
 
-# Follow-up to shit-happens  
+***  
+
+This is a follow-up report to [The differential impact of major life events on cognitive and affective wellbeing [@kettlewell2020]](https://doi.org/10.1016/j.ssmph.2019.100533).  
+
+***  
 
 
-This project describes the heterogeneity of mental health (MHi-5) trajectories around life events.  
+# Aims and background    
 
-The objective is to identify distinctive trajectories or _response-types_ in the average response to life-events, and challenge assumptions that an "average" trajectory exists. The aim does not include identifying the predictors of those trajectories/*response-types*, since identifying the predictors is an extensive goal in its own right and would need to be done in a separate project and only after identifying the presence of distinct *response-types*. Nevertheless the distinguishing characteristics of each *response-type* are explored and described in subsequent sections.  
+This document describes the heterogeneity of mental health (MHi-5) trajectories around life events.  
+
+The objective is to identify distinct trajectories or _response-types_ in the average response to life-events, and challenge assumptions that an "average" response exists. If distinct trajectories exist then the response to major life events is heterogenous in the population, and treatment or clinical support can be targeted to those subgroups most in need. However the aim does not include identifying the predictors of those trajectories/subgroups, since identifying the predictors is an extensive goal in its own right and would need to be done in a separate project and only after identifying the presence of distinct *response-types*. Nevertheless the distinguishing characteristics of each *response-type* are explored and described in subsequent sections.  
 
 <br>
+
 
 ## Problem statement  
 
@@ -31,23 +53,37 @@ Predicting mental health outcomes around life-events is irreproducible because o
 
 <br>
 
+
 ## Background  
 
-Quantile regression of life satisfaction trajectories shows real differences between responses at different levels of happiness ([O'Leary et al 2020](https://www.sciencedirect.com/science/article/pii/S0264999320311846)).  
+[Kettlewell et al 2020](https://doi.org/10.1016/j.ssmph.2019.100533) reported the average response to the worst life events such as bankruptcy or getting fired was U-shaped, and concluded that most people (*on average*) are resilient to negaative life events. Here I test that assumption by estimating whether latent classes of trajectories exist within the "average" trajectory using growth mixture modeling (**GMM**). It is possible that most people are not resilient, and instead the average trajectory contains multiple trajectories within it. These _sub trajectories_ may or may not exhibit the same trend as the average but nevertheless combine to produce an average U-shaped trajectory.   
 
 
-Finite mixture modelling of psychological health (MHI-5) trajectories shows a heterogenious response to major life events, which identifies three latent trajectories - no response, moderate response and recovery, rapid/steep response and recovery ([Etile et al 2020](https://www.sciencedirect.com/science/article/abs/pii/S0167268121003838)).  
+Since then two studies of the HILDA survey, using different methods, have provided evidence for heterogeneous responses to major life events. Quantile regression of life satisfaction scores showed differences between trajectories at different levels (*quantiles*) of life satisfaction ([O'Leary et al 2020](https://www.sciencedirect.com/science/article/pii/S0264999320311846)). And finite mixture modelling of MHI-5 scores revealed the three latent trajectories ([Etile et al 2020](https://www.sciencedirect.com/science/article/abs/pii/S0167268121003838)), shown below.
+<br>
 
+**Etile et al 2020 Figure 3**
 
+![Model estimated trajectories in MHI-5 scores in response to a life event (at Year 0)](../docs/literature/etile_figure.jpg)  
+
+\ 
+
+In both cases, the differences between trajectories can best be described as a difference in the degree of the same U-shaped function, rather than representing distinctly different shaped trajectories.  
 
 
 <br>
 
-## Methods  
+# Methods  
 
 <br>
 
-### Growth Mixture Models (GMM)  
+## MHI-5 scores  
+
+To be added...  
+
+<br>
+
+## Growth Mixture Models (GMM)  
 
 Standard growth models (*Latent Growth Curve Analysis* or LGCA) estimate a single trajectory that averages the individual trajectories of all participants in the sample. Individual differences are captured by estimating a random coefficient representing the variability around the slope and intercept. Categorical or continuous features can be used to predict individual differences in slope or intercept (e.g., risk factors). Only useful when all individuals are expected to change in the same direction over time (degree of change can vary).  
 
@@ -56,9 +92,9 @@ Standard growth models (*Latent Growth Curve Analysis* or LGCA) estimate a singl
 
 <br>
 
-### Current study  
+## Current study  
 
-Here we used polynomial terms (i.e., linear, quadratic and cubic trends) to distinguish the trajecotry of each latent class. Polynomial terms are a common choice due to their flexibility and ease of implementation, however they impose some restrictions on the functional form (e.g., they do not allow for extrapolation or prediction beyond the observed data range). In our case the restricted functional form is not a disadvantage since our aim is descriptive, and the restriction will facilitate convergence during model estimation. We selected a data range of ±3 years around the event, which was deemed sufficient to capture the variation due to anticipation and reaction to the event. Years beyond this range are likely to reflect other events or factors (rendering any extrapolation unreliable and of little value, see Kettlewell et al 2020 and also Fritjers et al). We also restricted the analysis to 3rd order terms because higher order polynomial terms result in parameters that are difficult to interpret, and are highly contingent on data handling features such as centering choices (Dalal and Zickar (2012).
+Here we used polynomial terms (i.e., linear, quadratic and cubic trends) to distinguish the trajectory of each latent class. Polynomial terms are a common choice due to their flexibility and ease of implementation, however they impose some restrictions on the functional form (e.g., they do not allow for extrapolation or prediction beyond the observed data range). In our case the restricted functional form is not a disadvantage since our aim is descriptive, and the restriction will facilitate convergence during model estimation. We selected a data range of ±3 years around the event, which was deemed sufficient to capture the variation due to anticipation and reaction to the event. Years beyond this range are likely to reflect other events or factors (rendering any extrapolation unreliable and of little value, see Kettlewell et al 2020 and also Fritjers et al). We also restricted the analysis to 3rd order terms because higher order polynomial terms result in parameters that are difficult to interpret, and are highly contingent on data handling features such as centering choices (Dalal and Zickar (2012).
 
 
 Nested models testing the inclusion of each additional trajectory j can be tested using 2∆BIC (two times the difference in BIC). 2∆BIC < 2 is weak evidence for the more complex model; < 6 moderate evidence; < 10 strong evidence; > 10 very strong. (still need to ensure parsimony by iteratively removing non-significant cubic and quadratic terms).  
@@ -77,9 +113,9 @@ e.g., a bastardized LCGA method. This may be equivalent to heirarchical growth a
 
 <br>
 
-#### Notes of caution:  
+### Notes of caution:  
 
-- Erosheva, E. A., Matsueda, R. L., & Telesca, D. (2014). Breaking bad: two decades of life- course data analysis in criminology, developmental psychology, and beyond. Annual Review of Statistics and Its Application, 1, 301-332.
+- Erosheva, E. A., Matsueda, R. L., & Telesca, D. (2014). Breaking bad: two decades of life-course data analysis in criminology, developmental psychology, and beyond. Annual Review of Statistics and Its Application, 1, 301-332.
 - Bauer DJ. 2007. Observations on the use of growth mixture models in psychological research. Multivar. Behav.Res. 42(4):757–86.
 - Bauer DJ, Curran PJ. 2003a. Distributional assumptions of growth mixture models: Implications for overextraction of latent trajectory classes. Psychol. Methods 8(3):338–63.
 - Bauer DJ, Curran PJ. 2004. The integration of continuous and discrete latent variable models: Fourth level potential problems and promising opportunities. Psychol. Methods 9(1):3–29.
@@ -89,12 +125,212 @@ e.g., a bastardized LCGA method. This may be equivalent to heirarchical growth a
 
 <br>
 
+# Results  
+
+<br>
+
+## Bankruptcy  
+
+A major financial loss or _bankruptcy_ (`lefnw`) was the most severe life event reported in HILDA according to the depth of the U-shaped function [@kettlewell2020].  
+
+Initially a linear multilevel model (**LMM**) of MHI-5 scores was fit using the `lcmm` package, with fixed and random effects for linear, quadratic and cubic polynomial terms and no mixtures, so this model assumed a homogeneous response. This model was used as a baseline comparison for subsequent growth mixture models (**GMM**) with 2, 3 and 4 classes.  
+
+
+```{r import_lefnw_fits}
+fdf <- read_rds("../data/lefnw_mf.rds") |> 
+  as.data.frame()
+
+ghmh_lefnw_1group <- read_rds("../results/ghmh_lefnw_1group.rds")
+ghmh_lefnw_2group <- read_rds("../results/ghmh_lefnw_2group.rds")
+ghmh_lefnw_3group <- read_rds("../results/ghmh_lefnw_3group.rds")
+ghmh_lefnw_4group <- read_rds("../results/ghmh_lefnw_4group.rds")
+
+losat_lefnw_1group <- read_rds("../results/losat_lefnw_1group.rds")
+losat_lefnw_2group <- read_rds("../results/losat_lefnw_2group.rds")
+losat_lefnw_3group <- read_rds("../results/losat_lefnw_3group.rds")
+losat_lefnw_4group <- read_rds("../results/losat_lefnw_4group.rds")
+```
+
+<br>
+
+
+
+```{r fig_1, fig.dim = c(7, 7), fig.cap="*Figure legend*: Mean predicted response (points) and mean observed response (lines & ±95%CI shaded) to bankruptcy at time 0 revealed the familiar U-shaped function previously reported by Kettlewell et al 2020"}
+plot(ghmh_lefnw_1group, 
+     which="fit", var.time="time", marg=FALSE, shades = TRUE, 
+     legend=NULL, main = "Figure 1. LLM results: Weighted subject-specific predictions")
+```
+
+
+
+<br>
+
+
+
+### Model comparison  
+
+Each model successfully converged according to the default thresholds in `lcmm`. 
+
+Three fit statistics were compared: **AIC** computed as -2L+2P (lower is better); **BIC** computed as -2L+P log(N) (lower is better); and **Entropy** computed as $1+\sum[\pi_{ig} \times log(\pi_{ig})]/(N \times log(G))$ where $\pi_{ig}$ is the posterior probability that subject $i$ belongs to class $g$ (the closer to one the better).  
+
+**Figure 2. Model fit comparisons**  
+
+```{r fig_2, fig.cap="*Figure legend*: Fit statistics over models spanning 4 latent classes. Lower scores better for AIC and BIC. Scores closer to unity (1) better for entropy"}
+summaryplot(ghmh_lefnw_1group, ghmh_lefnw_2group, ghmh_lefnw_3group, ghmh_lefnw_4group, which = c("AIC", "BIC", "entropy"))
+```
+
+The results of the model comparison indicated a single class model was preferred by AIC and entropy, while a 3-class model was preferred by BIC.  
+
+<br>
+
+### Class discrimination  
+
+The discriminative ability of the 3-class model is shown below. _Mean posterior probabilities_ greater than 70% are acceptable (_mpp_ > 80% are good).  
+
+**Table 1. Posterior probabilities of classification**
+
+```{r table_1}
+postprob(ghmh_lefnw_3group)
+```
+
+The three classes distinguished by this model were dominated by a single class (`class2` was 83.96% of cases). The _mean posterior probablities_ of each class were acceptable (lowest _mpp_ was `0.7331`), however the _individual posterior probabilities_ for some classes were poor (e.g., `class3` 53.09%). This indicates a substantial proportion of individuals are not strongly classified into `class1` or `class3`, perhaps due to overlapping trajectories or too many classes in the model.  
+
+The predicted vs observed trajectories of the two and three class models are shown below to further judge class discrimination.  
+
+
+
+**Figure 3. Predicted and observed trajectories for 2- and 3-class models**  
+
+
+```{r fig_3, out.width=c('50%', '50%'), fig.show='hold', fig.dim = c(7, 7), fig.cap="*Figure legend*: Three latent class trajectories of the mean predicted (points) and observed response (lines & ±95%CI shaded) to bankruptcy. Black: class 1; Red: class 2; Green: class 3"}
+plot(ghmh_lefnw_2group, 
+     which="fit", var.time="time", marg=FALSE, shades = TRUE, 
+     legend=NULL) 
+plot(ghmh_lefnw_3group, 
+     which="fit", var.time="time", marg=FALSE, shades = TRUE, 
+     legend=NULL)  
+```
+
+Three distinct trajectories were revealed, however some predicted values fell outside the 95%CI expected range of the observed mean values, especially in the largest class (Red: class 2).  
+
+
+
+<br>
+
+### Predicting classes  
+
+The class discrimination results indicated the response to bankruptcy may be heterogeneous, however there was only weak evidence the individuals in the smaller two classes were well distinguished. Adding class predictors to the model may help distinguish the smaller classes and improve the evidence for true heterogeneity of the response.     
+
+We fit a growth mixture model using `lcmm` which included 3 latent classes as well as predictors for class membership. The predictors included variables representing socioecononimc index (SEIFA), highest education, chronic illness, as well as average age and period (calendar years) over the period observed for each person. We also included dummy covariates for other events as fixed effects to explain variability due to concomitant life events.   
+
+```{r import_cov}
+ghmh_lefnw_3group_cov <- read_rds("../results/ghmh_lefnw_3group_cov.rds")
+```
+
+**Table 2. Posterior probabilities of classification with class predictors**  
+
+```{r table_2}
+postprob(ghmh_lefnw_3group_cov)
+```
+
+The 3-class model with class predictors produced similar class discrimination as above (3.1.1.2). The largest class represented almost 7 in 10 people (`69.21%`), and the mean posterior probabilities were satisfactory (lowest _mpp_ was `0.7498`). The _individual posterior probabilities_ in the smallest class was relatively improved (53.09% increased to 58.75%), and the predicted trajectories matched the observed values within 95%CI - as shown below.    
+
+
+<br>
+
+**Figure 4. Predicted and observed trajectories for 3-class model with predictors**  
+
+```{r fig_4, fig.dim=c(7, 7), fig.cap="*Legend*: Three latent class trajectories of the mean predicted (points) and mean observed response (lines & ±95%CI shaded) to bankruptcy. Black: class 1; Red: class 2; Green: class 3"}
+fjdf <- fdf
+
+plot(ghmh_lefnw_3group_cov, 
+     which="fit", var.time="time", marg=FALSE, shades = TRUE, 
+     legend=NULL)  
+```
+
+
+<br>
+
+**Table 3. Estimates of fixed effects in the class-membership**  
+```{r table_3, eval=F}
+summary(ghmh_lefnw_3group_cov)
+```
+```
+(the class of reference is the last class) 
+
+                     coef      Se    Wald p-value
+intercept class1  1.03173 2.99766   0.344 0.73071
+intercept class2 -0.32457 0.23466  -1.383 0.16661
+chronic class1   -1.14240 0.09552 -11.960 0.00000***
+chronic class2   -0.10783 0.11943  -0.903 0.36656
+edu.L class1      0.42316 2.66311   0.159 0.87375
+edu.L class2     -0.22727 0.26913  -0.844 0.39842
+edu.Q class1      0.75848 5.98532   0.127 0.89916
+edu.Q class2     -0.20923 0.33188  -0.630 0.52841
+edu.C class1     -1.04017 8.03291  -0.129 0.89697
+edu.C class2      0.01808 0.39547   0.046 0.96353
+SEIFA class1      0.23881 0.08127   2.938 0.00330**
+SEIFA class2      0.04090 0.10625   0.385 0.70029
+age class1        0.89698 0.09972   8.995 0.00000***
+age class2       -0.12844 0.12265  -1.047 0.29497
+period class1    -0.39324 0.08226  -4.780 0.00000***
+period class2    -0.22761 0.11139  -2.043 0.04101*
+```
+
+The standardized class-membership coefficients revealed some significant differences with the baseline class (class 3 in green, with the lowest overall MHI-5 trajectory). The predictor with the largest standardized coefficient was chronic illness which significantly reduced the log odds of membership in class 1 (log odds -1.14 [0.09], *p* < .001). Conversely the log odds of membership in class 1 significantly _increased_ with higher socioeconomic index (*p* < .01) and age (*p* < .001), and _decreased_ with period (*p* < .001). The log odds of membership in class 2 also decreased with period (*p* < .05).  
+
+Thus relative to class 3 (green), class 1 (black) were less likely to be chronically ill, older and enjoy a higher socioeconomic status. Class 2 was slightly more likely to be observed at an earlier time point.    
+
+<br>
+
+### Life-satisfaction  
+
+**Figure 5. Model fit comparisons**  
+
+```{r fig_5, fig.cap="*Figure legend*: Fit statistics over models spanning 4 latent classes. Lower scores better for AIC and BIC. Scores closer to unity (1) better for entropy"}
+summaryplot(losat_lefnw_1group, losat_lefnw_2group, losat_lefnw_3group, losat_lefnw_4group, which = c("AIC", "BIC", "entropy"))
+```
+
+<br>
+
+**Table 1. Posterior probabilities of classification**
+
+```{r table_4}
+postprob(losat_lefnw_4group)
+```
+
+<br>
+
+**Figure 6. Predicted and observed trajectories for 2- and 3-class models**  
+
+```{r fig_6, out.width=c('50%', '50%'), fig.show='hold', fig.dim = c(7, 7), fig.cap=""}
+plot(losat_lefnw_3group, 
+     which="fit", var.time="time", marg=FALSE, shades = TRUE, 
+     legend=NULL)  
+plot(losat_lefnw_4group, 
+     which="fit", var.time="time", marg=FALSE, shades = TRUE, 
+     legend=NULL)  
+```
+
+<br>
+
+## Divorce  
+
+<br>
+
+# Conclusions  
+
+The evidence for heterogeneity in response to bankruptcy
+
+
+
+<br>
 
 # Appendix  
 
 <br>
 
-### Latent Class Growth Analysis (LCGA) (Nagin 1999, 2001)  
+### Latent Class Growth Analysis (LCGA) (Nagin, 1999)  
 
 https://www.tqmp.org/RegularArticles/vol05-1/p011/p011.pdf  
 
@@ -104,4 +340,6 @@ See R package `lcmm` and specify no random effect (i.e., random=~-1 in lcmm or h
 
 Other forms of growth curve modelling also use fixed functional forms (linear, quadratic and cubic trends) to identify trajectories, including the standard growth curve models or group-based models (Nagin 1999, 2005, 2010).  
 
+<br>
 
+# References  
