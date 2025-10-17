@@ -1,11 +1,11 @@
 library(tidyverse)
 require(lcmm)
 
-lesep <- read_rds("../HILDA/data/quarterly events long.rds") |> 
+lesep <- read_rds("../../HILDA/data/quarterly events long.rds") |> 
   filter(event == "lesep") |> 
   select(year, xwaveid, qtr, val)
 
-swb <- read_rds("../HILDA/data/SWB.rds") |> 
+swb <- read_rds("../../HILDA/data/SWB.rds") |> 
   select(year = wave, xwaveid, ghmh, age, sex) |> 
   filter(xwaveid %in% lesep$xwaveid)
 
@@ -30,7 +30,6 @@ df <- left_join(swb, lesep, by = join_by(xwaveid, year)) |>
   filter(!is.na(ghmh)) |> 
   filter(between(time, -3, 3)) |> 
   filter(min(time) == -3) |> 
-  # mutate(ghmh = ghmh - mean(ghmh, na.rm=T)) |> 
   select(xwaveid, time, ghmh, age, sex) |> 
   ungroup()
 
@@ -38,80 +37,75 @@ fdf <- df |>
   # filter(xwaveid %in% sample(unique(df$xwaveid), 100)) |>
   as.data.frame()
   
+write_rds(fdf, "../data/lesep_ghmh_mf.rds")
 
-ghmh.m1 <- hlme(ghmh ~ time + I(time^2) + I(time^3) + sex,
+m1 <- hlme(ghmh ~ time + I(time^2) + I(time^3),
            random =~ time + I(time^2) + I(time^3),
            subject = 'xwaveid', 
            ng = 1,
            data = fdf)
 
-# write_rds(ghmh.m1, "results/ghmh_lesep_1group.rds")
+write_rds(m1, "../results/ghmh_lesep_1group.rds")
 
 # Estimation considering 2 classes : 
-ghmh.m2 <- gridsearch(
-  hlme(ghmh ~ time + I(time^2) + I(time^3) + sex,
-           random =~ time + I(time^2) + I(time^3),
-           subject = 'xwaveid', 
-           data = fdf, 
-           ng = 2, 
-           nproc = 2,
-           mixture =~time + I(time^2) + I(time^3)),
-  rep=100, maxiter=30, minit=ghmh.m1
+m2 <- gridsearch(
+  hlme(ghmh ~ time + I(time^2) + I(time^3),
+       random =~ time + I(time^2) + I(time^3),
+       subject = 'xwaveid', 
+       data = fdf, 
+       ng = 2, 
+       nproc = 2,
+       classmb =~ sex,
+       mixture =~time + I(time^2) + I(time^3)),
+  rep=100, maxiter=30, minit=m1
 )
 
-# write_rds(ghmh.m2, "results/ghmh_lesep_2group.rds")
-postprob(ghmh.m2)           
-plot(ghmh.m2, which="fit", var.time="time", marg=FALSE, shades = TRUE)  
+write_rds(m2, "../results/ghmh_lesep_2group.rds")
+postprob(m2)           
+plot(m2, which="fit", var.time="time", marg=FALSE, shades = TRUE)  
 
 
 # Estimation considering 3 classes : 
-ghmh.m3 <- gridsearch(
-  hlme(ghmh ~ time + I(time^2) + I(time^3) + sex,
-           random =~ time + I(time^2) + I(time^3),
-           subject = 'xwaveid', 
-           data = fdf, 
-           ng = 3, 
-           nproc = 3,
-           mixture =~time + I(time^2) + I(time^3)),
-  rep=100, maxiter=30, minit=ghmh.m1
+m3 <- gridsearch(
+  hlme(ghmh ~ time + I(time^2) + I(time^3),
+       random =~ time + I(time^2) + I(time^3),
+       subject = 'xwaveid', 
+       data = fdf, 
+       ng = 3, 
+       nproc = 3,
+       classmb =~ sex,
+       mixture =~time + I(time^2) + I(time^3)),
+  rep=100, maxiter=30, minit=m1
 )
 
-# write_rds(ghmh.m3, "results/ghmh_lesep_3group.rds")
-postprob(ghmh.m3)           
-plot(ghmh.m3, which="fit", var.time="time", marg=FALSE, shades = TRUE)  
+write_rds(m3, "../results/ghmh_lesep_3group.rds")
+postprob(m3)           
+plot(m3, which="fit", var.time="time", marg=FALSE, shades = TRUE)  
 
 
 # Estimation considering 4 classes : 
-ghmh.m4 <- gridsearch(
+m4 <- gridsearch(
   hlme(ghmh ~ time + I(time^2) + I(time^3) + sex,
-           random =~ time + I(time^2) + I(time^3),
-           subject = 'xwaveid', 
-           data = fdf, 
-           ng = 4, 
-           nproc = 4, 
-           mixture =~time + I(time^2) + I(time^3)),
-  rep=100, maxiter=30, minit=ghmh.m1
+       random =~ time + I(time^2) + I(time^3),
+       subject = 'xwaveid', 
+       data = fdf, 
+       ng = 4, 
+       nproc = 4, 
+       mixture =~time + I(time^2) + I(time^3)),
+  rep=100, maxiter=30, minit=m1
 )
 
-# write_rds(ghmh.m4, "results/ghmh_lesep_4group.rds")
-postprob(ghmh.m4)           
-plot(ghmh.m4, which="fit", var.time="time", marg=FALSE, shades = TRUE)  
+# write_rds(m4, "results/ghmh_lesep_4group.rds")
+postprob(m4)           
+plot(m4, which="fit", var.time="time", marg=FALSE, shades = TRUE)  
 
 
-summarytable(ghmh.m1, ghmh.m2, ghmh.m3, ghmh.m4,
+summarytable(m1, m2, m3,
   which = c("G", "loglik", "conv", "npm", "AIC", "BIC", "SABIC", "entropy",
             "ICL", "%class")
 )
 
-summaryplot(ghmh.m1, ghmh.m2, ghmh.m3, ghmh.m4,
-            which = c("BIC", "entropy","ICL"))
+summaryplot(m1, m2, m3, which = c("AIC", "BIC", "entropy"))
              
-# summaryplot(
-#   read_rds("results/ghmh_lesep_1group.rds"),
-#   read_rds("results/ghmh_lesep_2group.rds"),
-#   read_rds("results/ghmh_lesep_3group.rds"),
-#   ghmh.m4,
-#   which = c("BIC", "entropy","ICL")
-# )
 
              

@@ -5,7 +5,7 @@ lefnw <- read_rds("../HILDA/data/quarterly events long.rds") |>
   filter(event == "lefnw") |> 
   select(year, xwaveid, qtr, val)
 
-swb <- read_rds("data/SWB.rds") |> 
+swb <- read_rds("../HILDA/data/SWB.rds") |> 
   select(year = wave, xwaveid, losat, age, sex) |> 
   filter(xwaveid %in% lefnw$xwaveid)
 
@@ -29,7 +29,7 @@ df <- left_join(swb, lefnw, by = join_by(xwaveid, year)) |>
   filter(!is.na(losat)) |> 
   filter(between(time, -3, 3)) |> 
   filter(min(time) == -3) |> 
-  mutate(losat = losat - mean(losat, na.rm=T)) |>
+  # mutate(losat = losat - mean(losat, na.rm=T)) |>
   select(xwaveid, time, losat, age, sex) |> 
   ungroup()
 
@@ -38,13 +38,15 @@ fdf <- df |>
   mutate(losat = jitter(losat)) |> 
   as.data.frame()
 
+write_rds(fdf, "../data/lefnw_losat_mf.rds")
+
 m1 <- hlme(losat ~ time + I(time^2) + I(time^3) + sex,
            random =~ time + I(time^2) + I(time^3),
            subject = 'xwaveid', 
            ng = 1,
            data = fdf)
 
-write_rds(m1, "results/losat_lefnw_1group.rds")
+write_rds(m1, "../results/losat_lefnw_1group.rds")
 
 # Estimation considering 2 classes : 
 m2 <- gridsearch(
@@ -58,7 +60,7 @@ m2 <- gridsearch(
   rep=10, maxiter=30, minit=m1
 ) 
 
-write_rds(m2, "results/losat_lefnw_2group.rds")
+write_rds(m2, "../results/losat_lefnw_2group.rds")
 postprob(m2)           
 plot(m2, which="fit", var.time="time", marg=FALSE, shades = TRUE)  
 
@@ -75,7 +77,7 @@ m3 <- gridsearch(
   rep=10, maxiter=30, minit=m1
 )
 
-write_rds(m3, "results/losat_lefnw_3group.rds")
+write_rds(m3, "../results/losat_lefnw_3group.rds")
 postprob(m3)           
 plot(m3, which="fit", var.time="time", marg=FALSE, shades = TRUE)  
 
@@ -91,6 +93,22 @@ m4 <- gridsearch(
   rep=100, maxiter=30, minit=m1
 )
 
-write_rds(m4, "results/losat_lefnw_4group.rds")
+write_rds(m4, "../results/losat_lefnw_4group.rds")
 postprob(m4)           
 plot(m4, which="fit", var.time="time", marg=FALSE, shades = TRUE)  
+
+# Estimation considering 5 classes : 
+m5 <- gridsearch(
+  hlme(losat ~ time + I(time^2) + I(time^3) + sex,
+       random =~ time + I(time^2) + I(time^3),
+       subject = 'xwaveid', 
+       data = fdf, 
+       ng = 5, 
+       nproc = 5, 
+       mixture =~time + I(time^2) + I(time^3)),
+  rep=100, maxiter=30, minit=m1
+)
+
+postprob(m5)
+
+summaryplot(m1, m2, m3, m4, m5, which = c("AIC", "BIC", "entropy"))
